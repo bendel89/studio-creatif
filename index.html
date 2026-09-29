@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Studio Créatif</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,sans-serif;background:#0a0e1a;color:#e8ecf8;min-height:100vh;padding:1rem 1rem 6rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
+h1{text-align:center;font-size:1.5rem;margin-bottom:0.3rem;background:linear-gradient(135deg,#4a9eff,#7c5cff,#d94aff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;font-size:0.82rem;color:#8892b0;margin-bottom:1rem}
+.tabs{display:flex;gap:0.3rem;background:#131829;border:1px solid #2a3350;border-radius:12px;padding:0.3rem;margin-bottom:1rem}
+.tab{flex:1;padding:0.7rem;border-radius:9px;background:transparent;color:#8892b0;border:none;font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#4a9eff,#7c5cff);color:#fff}
+.module{display:none}
+.module.active{display:block}
+.panel{background:#131829;border:1px solid #2a3350;border-radius:12px;padding:1rem;margin-bottom:1rem}
+.panel.ok{border-color:#2d8a4e}
+.lbl{font-size:0.7rem;color:#8892b0;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:0.6rem}
+input,textarea,select{width:100%;padding:0.85rem;border-radius:10px;border:1px solid #2a3350;background:#1a2036;color:#e8ecf8;font-family:inherit;font-size:0.9rem}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff}
+textarea{min-height:100px;resize:vertical;line-height:1.5}
+input[type=password]{font-family:monospace;font-size:0.85rem}
+button.primary{width:100%;padding:1rem;border-radius:12px;border:none;background:linear-gradient(135deg,#4a9eff,#7c5cff);color:#fff;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:1rem}
+button.primary:active{transform:scale(0.98)}
+button.primary:disabled{opacity:0.35;cursor:not-allowed}
+.status{font-size:0.75rem;padding:0.55rem 0.85rem;border-radius:8px;display:flex;align-items:center;gap:0.5rem;background:#1a2036;color:#8892b0;margin-top:0.6rem}
+.status.ok{background:rgba(45,138,78,0.15);color:#6ee7a3;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:#4a5578}
+.status.ok .dot{background:#6ee7a3}
+.upload{border:2px dashed #2a3350;border-radius:12px;padding:2rem 1rem;text-align:center;cursor:pointer;margin-bottom:1rem;background:#131829}
+.upload input{display:none}
+.up-icon{font-size:2.4rem;color:#4a9eff;line-height:1;margin-bottom:0.5rem}
+.up-text{font-size:0.95rem;color:#e8ecf8;font-weight:500}
+.up-hint{font-size:0.75rem;color:#8892b0;margin-top:0.2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:0.5rem;margin-bottom:1rem}
+.card{position:relative;border-radius:10px;overflow:hidden;border:1px solid #2a3350;background:#000;aspect-ratio:9/16}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;border:none;width:24px;height:24px;border-radius:50%;font-size:12px;cursor:pointer}
+.styles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem}
+.style-card{padding:0.7rem 0.8rem;border-radius:10px;border:1px solid #2a3350;background:#1a2036;cursor:pointer;display:flex;align-items:center;gap:0.5rem}
+.style-card.sel{background:linear-gradient(135deg,rgba(74,158,255,0.2),rgba(124,92,255,0.2));border-color:#4a9eff}
+.style-em{font-size:1.2rem}
+.style-nm{font-size:0.78rem;font-weight:600;line-height:1.2}
+.style-ds{font-size:0.65rem;color:#8892b0;margin-top:0.1rem}
+.cr{margin-bottom:0.9rem}
+.cl{display:block;font-size:0.72rem;color:#8892b0;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
+.result{background:#131829;border:1px solid #2d8a4e;border-radius:12px;padding:1rem;margin-top:1rem;font-size:0.9rem;line-height:1.6;white-space:pre-wrap}
+.result-img,.result-video{width:100%;border-radius:12px;display:block;background:#000}
+.result-video{aspect-ratio:9/16;object-fit:cover}
+.queue-item{display:flex;align-items:center;gap:0.8rem;padding:0.75rem;border-radius:10px;border:1px solid #2a3350;margin-bottom:0.4rem;background:#131829;font-size:0.82rem}
+.queue-item.processing{border-color:#4a9eff}
+.queue-item.done{border-color:#2d8a4e}
+.queue-item.failed{border-color:#c0392b}
+.q-icon{font-size:1rem;width:1.5rem;text-align:center}
+.q-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-status{font-size:0.72rem;color:#8892b0;text-align:right}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.8rem;margin-top:1rem}
+.gal-item{border-radius:12px;overflow:hidden;border:1px solid #2a3350;background:#000}
+.gal-item img,.gal-item video{width:100%;display:block;aspect-ratio:9/16;object-fit:cover}
+.gal-caption{padding:0.5rem;background:#131829;font-size:0.7rem;color:#8892b0}
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.95);color:#fff;padding:0.85rem 1rem;font-size:0.8rem;display:flex;align-items:center;gap:0.6rem;transform:translateY(100%);transition:transform 0.3s;z-index:100;border-top:1px solid #2a3350}
+.status-bar.visible{transform:translateY(0)}
+.spinner{width:14px;height:14px;border:2px solid rgba(74,158,255,0.3);border-top-color:#4a9eff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:#131829;color:#fff;padding:0.9rem 1.4rem;border-radius:12px;font-size:0.85rem;border:1px solid #2a3350;z-index:1000;opacity:0;transition:all 0.35s;max-width:90vw;text-align:center}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-color:#2d8a4e}
+.toast.error{border-color:#c0392b}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<h1>Studio Créatif</h1>
+<p class="sub">Texte · Image · Vidéo — Propulsé par l'IA</p>
+
+<div class="tabs" id="tabs">
+<button class="tab active" data-mod="text">📝 Texte</button>
+<button class="tab" data-mod="image">🖼️ Image</button>
+<button class="tab" data-mod="video">🎬 Vidéo</button>
+</div>
+
+<div class="module active" id="mod-text">
+<div class="panel">
+<div class="lbl">📝 Que veux-tu écrire ?</div>
+<textarea id="textPrompt" placeholder="Exemples : une histoire courte sur un robot qui découvre la mer, un script de 30 secondes pour une pub, 10 idées de vidéos TikTok sur la cuisine"></textarea>
+</div>
+<div class="panel">
+<div class="lbl">🎨 Ton / Style</div>
+<select id="textStyle">
+<option value="neutral">Neutre</option>
+<option value="cinematic">Cinématique</option>
+<option value="poetic">Poétique</option>
+<option value="funny">Humoristique</option>
+<option value="dramatic">Dramatique</option>
+<option value="scientific">Scientifique</option>
+<option value="marketing">Marketing / Pub</option>
+<option value="storytelling">Conte / Storytelling</option>
+</select>
+</div>
+<div class="panel">
+<div class="lbl">📏 Longueur</div>
+<select id="textLength">
+<option value="short">Court (1-2 phrases)</option>
+<option value="medium" selected>Moyen (1 paragraphe)</option>
+<option value="long">Long (3-5 paragraphes)</option>
+</select>
+</div>
+<button class="primary" id="genText">Générer le texte</button>
+<div id="textResult"></div>
+</div>
+
+<div class="module" id="mod-image">
+<div class="panel">
+<div class="lbl">🖼️ Décris ton image</div>
+<textarea id="imagePrompt" placeholder="Exemples : un chat astronaute flottant dans l'espace, une ville cyberpunk sous la pluie, un paysage de montagne au coucher du soleil"></textarea>
+</div>
+<div class="panel">
+<div class="lbl">🎨 Style visuel</div>
+<div class="styles-grid" id="stylesGridImage"></div>
+</div>
+<button class="primary" id="genImage">Générer l'image</button>
+<div id="imageResult"></div>
+</div>
+
+<div class="module" id="mod-video">
+<div class="upload" id="uploadZone">
+<input type="file" id="fileInput" accept="image/*" multiple>
+<div class="up-icon">＋</div>
+<div class="up-text">Ajouter une image</div>
+<div class="up-hint">Elle deviendra une vidéo animée</div>
+</div>
+<div class="grid" id="imgGrid"></div>
+<div class="panel">
+<div class="lbl">🎬 Décris le mouvement</div>
+<textarea id="videoPrompt" placeholder="Exemples : le sujet tourne lentement la tête vers la caméra, la caméra s'éloigne pour révéler le paysage, des particules dorées flottent dans l'air"></textarea>
+</div>
+<div class="panel">
+<div class="lbl">🎨 Style</div>
+<div class="styles-grid" id="stylesGridVideo"></div>
+</div>
+<div class="panel">
+<div class="cr"><label class="cl">Durée</label>
+<select id="videoDuration">
+<option value="121">5 secondes</option>
+<option value="153" selected>6,4 secondes</option>
+<option value="241">10 secondes</option>
+<option value="337">14 secondes</option>
+<option value="441">18 secondes (max)</option>
+</select></div>
+</div>
+<button class="primary" id="genVideo">Générer la vidéo</button>
+<button class="primary hidden" id="stopBtn" style="background:#c0392b">⏹ Arrêter</button>
+<div id="queue"></div>
+<div id="videoResult"></div>
+</div>
+
+<div class="panel hidden" id="galleryPanel" style="margin-top:1.5rem">
+<div class="lbl">🎬 Créations générées</div>
+<div class="gal-grid" id="galGrid"></div>
+</div>
+
+<div class="status-bar" id="statusBar">
+<div class="spinner"></div>
+<span id="statusText">Préparation…</span>
+</div>
+<div class="toast" id="toast">
+<span id="toastText">Message</span>
+</div>
+<script>
+const API_KEY = 'sk-M00AWyCVwAbxcjJ7cuGHIvsHOEAwds7uj3B9ihV2B2UTU1ee';
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const MODEL_IMAGE = 'agnes-image-v2.0';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const FRAME_RATE = 24;
+const POLL_INTERVAL_SEC = 8;
+const MAX_POLL_ATTEMPTS = 100;
+const CREATE_INTERVAL_MS = 75000;
+
+const STYLES = [
+{id:'cinematic',emoji:'🎬',name:'Cinématique',desc:'Film hollywoodien',prompt:'cinematic film look, dramatic lighting, shallow depth of field, professional color grading'},
+{id:'anime',emoji:'🌸',name:'Anime',desc:'Style japonais',prompt:'anime style, Japanese animation, cel-shaded, vibrant colors, Studio Ghibli inspired'},
+{id:'cyberpunk',emoji:'🌃',name:'Cyberpunk',desc:'Néon futuriste',prompt:'cyberpunk aesthetic, neon pink and cyan lighting, holographic ads'},
+{id:'realistic',emoji:'📷',name:'Réaliste',desc:'Photoréaliste',prompt:'photorealistic, hyperdetailed, 8K, professional photography, natural lighting'},
+{id:'painting',emoji:'🎨',name:'Peinture',desc:'Huile classique',prompt:'classical oil painting, visible brushstrokes, rich texture, old master technique'},
+{id:'watercolor',emoji:'💧',name:'Aquarelle',desc:'Douce et fluide',prompt:'watercolor painting, soft bleeding edges, translucent washes, paper texture'},
+{id:'cartoon',emoji:'🎭',name:'Cartoon',desc:'Dessin animé',prompt:'cartoon style, thick outlines, flat colors, expressive characters'},
+{id:'pixar',emoji:'✨',name:'Pixar 3D',desc:'Animation 3D',prompt:'Pixar-style 3D animation, subsurface scattering, cinematic lighting'},
+{id:'noir',emoji:'🕵️',name:'Film Noir',desc:'Noir et blanc',prompt:'film noir aesthetic, high contrast black and white, dramatic shadows'},
+{id:'vintage',emoji:'📽️',name:'Vintage',desc:'Vieux film',prompt:'vintage film aesthetic, grainy texture, warm faded colors, Super 8 look'},
+{id:'fantasy',emoji:'🐉',name:'Fantasy',desc:'Médiéval magique',prompt:'fantasy art, epic medieval atmosphere, magical elements, dragons and castles'},
+{id:'scifi',emoji:'🚀',name:'Sci-Fi',desc:'Futur spatial',prompt:'science fiction, futuristic spacecraft, alien worlds, hyper-advanced technology'},
+{id:'horror',emoji:'👻',name:'Horreur',desc:'Ambiance sombre',prompt:'horror atmosphere, dark and ominous, creepy shadows, gothic elements'},
+{id:'pastel',emoji:'🌷',name:'Pastel',desc:'Teintes douces',prompt:'soft pastel palette, dreamy diffused light, ethereal mood'},
+{id:'neon',emoji:'💡',name:'Néon',desc:'Couleurs vives',prompt:'neon lighting, vibrant saturated colors, glowing effects'},
+{id:'minimal',emoji:'⬜',name:'Minimaliste',desc:'Épuré',prompt:'minimalist design, clean composition, negative space, elegant'},
+{id:'retro',emoji:'📻',name:'Rétro',desc:'Années 80',prompt:'retro 80s aesthetic, synthwave, chrome and neon, geometric patterns'},
+{id:'steampunk',emoji:'⚙️',name:'Steampunk',desc:'Vapeur et cuivre',prompt:'steampunk aesthetic, brass and copper, gears and steam, Victorian industrial'},
+{id:'surreal',emoji:'🌀',name:'Surréaliste',desc:'Onirique',prompt:'surrealist art, dreamlike distortions, impossible juxtapositions'},
+{id:'comic',emoji:'📘',name:'Comics',desc:'BD américaine',prompt:'American comic book style, bold ink lines, halftone dots, dynamic action'}
+];
+
+const state = {
+textStyle:'neutral',textLength:'medium',imageStyle:'cinematic',videoStyle:'cinematic',
+videoDuration:153,images:[],videoQueue:[],videoCompleted:0,videoFailed:0,
+videoStopped:false,videoRunning:false
+};
+</script>
+<script>
+function $(id){return document.getElementById(id);}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function log(m){console.log('[Studio] '+m);}
+
+let toastT=null;
+function toast(msg,type){
+type=type||'success';
+const t=$('toast');if(!t)return;
+t.className='toast';void t.offsetWidth;
+t.classList.add(type,'visible');
+$('toastText').textContent=msg;
+if(toastT)clearTimeout(toastT);
+toastT=setTimeout(()=>t.classList.remove('visible'),2800);
+}
+
+function setStatus(txt){
+const b=$('statusBar'),t=$('statusText');
+if(!b||!t)return;
+if(txt){b.classList.add('visible');t.textContent=txt;}
+else b.classList.remove('visible');
+}
+
+function initTabs(){
+document.querySelectorAll('.tab').forEach(tab=>{
+tab.addEventListener('click',()=>{
+const mod=tab.dataset.mod;
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+tab.classList.add('active');
+const el=$('mod-'+mod);
+if(el)el.classList.add('active');
+});
+});
+}
+
+async function apiFetch(url,opts,retries){
+if(!retries)retries=6;
+for(let i=0;i<retries;i++){
+try{
+const r=await fetch(url,opts);
+if(r.status===429){await sleep([15,30,45,60,90,120][Math.min(i,5)]*1000);continue;}
+if(r.status===503){await sleep([5,10,15,20,30,45][Math.min(i,5)]*1000);continue;}
+return r;
+}catch(e){await sleep([3,5,8,12,20,30][Math.min(i,5)]*1000);}
+}
+return fetch(url,opts);
+}
+
+const TEXT_STYLES={
+neutral:'Réponds de manière claire et neutre.',
+cinematic:'Écris de manière cinématographique, avec des descriptions visuelles fortes.',
+poetic:'Écris de manière poétique, avec des métaphores et un rythme musical.',
+funny:'Écris de manière humoristique, avec des jeux de mots.',
+dramatic:'Écris de manière dramatique, avec de la tension et des émotions fortes.',
+scientific:'Écris de manière scientifique, précise et pédagogique.',
+marketing:'Écris comme un copywriter publicitaire percutant.',
+storytelling:'Raconte comme un conteur : introduction, développement, climax, conclusion.'
+};
+
+const TEXT_LENGTHS={
+short:'en 1 à 2 phrases maximum.',
+medium:'en 1 paragraphe clair et structuré.',
+long:'en 3 à 5 paragraphes détaillés.'
+};
+
+async function generateText(){
+const prompt=$('textPrompt').value.trim();
+if(!prompt){toast('Écris d\'abord un sujet','error');return;}
+const style=TEXT_STYLES[state.textStyle]||TEXT_STYLES.neutral;
+const length=TEXT_LENGTHS[state.textLength]||TEXT_LENGTHS.medium;
+const btn=$('genText');
+btn.disabled=true;btn.textContent='Génération…';
+setStatus('L\'IA écrit…');
+try{
+const res=await apiFetch(API_BASE+'/chat/completions',{
+method:'POST',
+headers:{'Authorization':'Bearer '+API_KEY,'Content-Type':'application/json'},
+body:JSON.stringify({
+model:MODEL_TEXT,
+messages:[
+{role:'system',content:'Tu es un assistant créatif francophone. '+style+' Réponds '+length},
+{role:'user',content:prompt}
+],
+temperature:0.8,max_tokens:1500
+})
+});
+if(!res.ok){const e=await res.text();throw new Error('HTTP '+res.status+' — '+e.slice(0,150));}
+const data=await res.json();
+const text=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
+if(!text)throw new Error('Réponse vide');
+$('textResult').innerHTML='<div class="result">'+esc(text)+'</div>';
+toast('Texte généré ✓');
+}catch(e){
+toast('Erreur : '+e.message,'error',4000);
+}finally{
+btn.disabled=false;btn.textContent='Générer le texte';
+setStatus(null);
+}
+}
+</script>
+<script>
+function renderStyles(containerId,current,onSelect){
+const c=$(containerId); if(!c)return;
+c.innerHTML=STYLES.map(s=>
+'<div class="style-card'+(current===s.id?' sel':'')+'" data-id="'+s.id+'">'+
+'<div class="style-em">'+s.emoji+'</div>'+
+'<div><div class="style-nm">'+esc(s.name)+'</div><div class="style-ds">'+esc(s.desc)+'</div></div>'+
+'</div>'
+).join('');
+c.querySelectorAll('.style-card').forEach(el=>{
+el.addEventListener('click',()=>{
+onSelect(el.dataset.id);
+renderStyles(containerId,el.dataset.id,onSelect);
+});
+});
+}
+
+const galleryItems=[];
+
+function addToGallery(type,content,label){
+galleryItems.unshift({type,content,label,ts:Date.now()});
+renderGallery();
+}
+
+function renderGallery(){
+const panel=$('galleryPanel'), grid=$('galGrid');
+if(!panel||!grid)return;
+if(!galleryItems.length){panel.classList.add('hidden');return;}
+panel.classList.remove('hidden');
+grid.innerHTML=galleryItems.slice(0,20).map(it=>{
+let inner='';
+if(it.type==='text')inner='<div style="padding:1rem;font-size:0.85rem;color:#e8ecf8;line-height:1.5;background:#1a2036;aspect-ratio:9/16;overflow:hidden">'+esc(it.content.slice(0,300))+(it.content.length>300?'…':'')+'</div>';
+else if(it.type==='image')inner='<img src="'+it.content+'" alt="">';
+else if(it.type==='video')inner='<video controls preload="metadata" muted playsinline><source src="'+it.content+'" type="video/mp4"></video>';
+return '<div class="gal-item">'+inner+'<div class="gal-caption">'+esc(it.label)+'</div></div>';
+}).join('');
+}
+
+async function generateImage(){
+const prompt=$('imagePrompt').value.trim();
+if(!prompt){toast('Décris ton image','error');return;}
+const style=STYLES.find(s=>s.id===state.imageStyle)||STYLES[0];
+const btn=$('genImage');
+btn.disabled=true;btn.textContent='Génération…';
+setStatus('L\'IA dessine…');
+try{
+const res=await apiFetch(API_BASE+'/images/generations',{
+method:'POST',
+headers:{'Authorization':'Bearer '+API_KEY,'Content-Type':'application/json'},
+body:JSON.stringify({
+model:MODEL_IMAGE,
+prompt:prompt+'. '+style.prompt,
+n:1,
+size:'1024x1792'
+})
+});
+if(!res.ok){const e=await res.text();throw new Error('HTTP '+res.status+' — '+e.slice(0,150));}
+const data=await res.json();
+let url='';
+if(data.data&&data.data[0]){
+url=data.data[0].url||data.data[0].b64_json;
+if(url&&!url.startsWith('http')&&!url.startsWith('data:')){
+url='data:image/png;base64,'+url;
+}
+}
+if(!url)throw new Error('Pas d\'image reçue');
+$('imageResult').innerHTML='<img class="result-img" src="'+url+'" alt="">';
+addToGallery('image',url,'Image — '+prompt.slice(0,40));
+toast('Image générée ✓');
+}catch(e){
+toast('Erreur : '+e.message,'error',4000);
+}finally{
+btn.disabled=false;btn.textContent='Générer l\'image';
+setStatus(null);
+}
+}
+
+function fileToDataUri(file){
+return new Promise((res,rej)=>{
+const r=new FileReader();
+r.onload=e=>res(e.target.result);
+r.onerror=()=>rej(new Error('Erreur lecture'));
+r.readAsDataURL(file);
+});
+}
+
+function makeThumb(dataUri){
+return new Promise(resolve=>{
+const img=new Image();
+img.onload=()=>{
+try{
+const c=document.createElement('canvas');
+const ratio=img.height/img.width;
+c.width=200;c.height=Math.round(200*ratio);
+const ctx=c.getContext('2d');
+ctx.drawImage(img,0,0,c.width,c.height);
+resolve(c.toDataURL('image/jpeg',0.7));
+}catch(e){resolve(dataUri);}
+};
+img.onerror=()=>resolve(dataUri);
+img.src=dataUri;
+});
+}
+
+async function processFile(file){
+if(!file.type.startsWith('image/'))return null;
+if(file.size>12*1024*1024)return null;
+try{
+const d=await fileToDataUri(file);
+const t=await makeThumb(d);
+return {id:Date.now()+Math.random(),dataUri:d,thumbnail:t};
+}catch(e){return null;}
+}
+
+async function handleFiles(files){
+const arr=Array.from(files).filter(f=>f.type.startsWith('image/'));
+if(!arr.length)return;
+setStatus('Chargement…');
+for(let i=0;i<arr.length;i+=5){
+const batch=arr.slice(i,i+5);
+const results=await Promise.allSettled(batch.map(f=>processFile(f)));
+for(const r of results){
+if(r.status==='fulfilled'&&r.value)state.images.push(r.value);
+}
+renderImages();
+}
+setStatus(null);
+refreshVideoBtn();
+toast(arr.length+' image'+(arr.length>1?'s':'')+' ajoutée'+(arr.length>1?'s':''));
+}
+
+function renderImages(){
+const g=$('imgGrid'); if(!g)return;
+g.innerHTML=state.images.map(img=>
+'<div class="card"><img src="'+(img.thumbnail||img.dataUri)+'" alt=""><button class="rm" data-id="'+img.id+'">✕</button></div>'
+).join('');
+g.querySelectorAll('.rm').forEach(b=>{
+b.addEventListener('click',e=>{
+e.stopPropagation();
+state.images=state.images.filter(i=>i.id!==parseFloat(b.dataset.id));
+renderImages();refreshVideoBtn();
+});
+});
+}
+
+function refreshVideoBtn(){
+const b=$('genVideo'); if(!b)return;
+b.disabled=!state.images.length||state.videoRunning;
+if(state.videoRunning)b.textContent='Génération… ('+(state.videoCompleted+state.videoFailed)+'/'+state.videoQueue.length+')';
+else if(!state.images.length)b.textContent='Ajoutez une image';
+else b.textContent='Générer '+state.images.length+' vidéo'+(state.images.length>1?'s':'');
+}
+
+function initStyles(){
+renderStyles('stylesGridImage',state.imageStyle,(id)=>{state.imageStyle=id;});
+renderStyles('stylesGridVideo',state.videoStyle,(id)=>{state.videoStyle=id;});
+}
+</script>
+<script>
+function buildVideoPrompt(){
+const style=STYLES.find(s=>s.id===state.videoStyle)||STYLES[0];
+const userPrompt=$('videoPrompt').value.trim();
+const parts=[];
+parts.push('Animate this image. Preserve the exact subject identity, face, pose, and composition.');
+parts.push(style.prompt);
+if(userPrompt)parts.push('Movement: '+userPrompt);
+parts.push('Portrait 9:16, 24fps, no text, no watermarks.');
+return parts.join('. ');
+}
+
+async function createVideoTask(dataUri,prompt){
+const res=await apiFetch(API_BASE+'/videos',{
+method:'POST',
+headers:{'Authorization':'Bearer '+API_KEY,'Content-Type':'application/json'},
+body:JSON.stringify({
+model:MODEL_VIDEO,
+prompt:prompt,
+image:dataUri,
+num_frames:state.videoDuration,
+frame_rate:FRAME_RATE
+})
+});
+if(!res.ok){const e=await res.text();throw new Error('HTTP '+res.status+' — '+e.slice(0,150));}
+const data=await res.json();
+const id=data.video_id||data.id||data.task_id;
+if(!id)throw new Error('Pas de video_id');
+return id;
+}
+
+async function pollVideoTask(videoId,onProgress){
+let r=30;
+while(r>0){
+if(state.videoStopped)throw new Error('Arrêt demandé');
+onProgress('Préparation… '+r+'s');
+await sleep(1000);r--;
+}
+for(let i=0;i<MAX_POLL_ATTEMPTS;i++){
+if(state.videoStopped)throw new Error('Arrêt demandé');
+if(i>0){
+let w=POLL_INTERVAL_SEC;
+while(w>0){
+if(state.videoStopped)throw new Error('Arrêt demandé');
+onProgress('En cours… '+w+'s');
+await sleep(1000);w--;
+}
+}
+const url=POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
+const res=await apiFetch(url,{method:'GET',headers:{'Authorization':'Bearer '+API_KEY}});
+const d=await res.json();
+const s=d.status||'';
+if(s==='completed'||s==='succeeded'||s==='done'){
+const u=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);
+if(!u)throw new Error('Pas d\'URL');
+return u;
+}
+if(s==='failed'||s==='error')throw new Error('Échec ('+s+')');
+}
+throw new Error('Timeout');
+}
+
+async function processVideoItem(item){
+try{
+item.status='creating';item.progress='Préparation…';renderVideoQueue();
+const prompt=buildVideoPrompt();
+item.videoId=await createVideoTask(item.image.dataUri,prompt);
+item.status='processing';item.progress='En cours…';renderVideoQueue();
+const url=await pollVideoTask(item.videoId,p=>{item.progress=p;renderVideoQueue();});
+item.status='done';item.videoUrl=url;
+state.videoCompleted++;
+renderVideoQueue();refreshVideoBtn();
+$('videoResult').innerHTML='<video class="result-video" controls preload="metadata" muted playsinline><source src="'+url+'" type="video/mp4"></video>';
+addToGallery('video',url,'Vidéo '+(item.idx+1));
+toast('Vidéo '+(item.idx+1)+' prête !');
+}catch(e){
+if(e.message==='Arrêt demandé'){item.status='failed';item.progress='Arrêté';}
+else{item.status='failed';item.progress='Échec';state.videoFailed++;}
+renderVideoQueue();refreshVideoBtn();
+}
+}
+
+function renderVideoQueue(){
+const q=$('queue'); if(!q)return;
+if(!state.videoQueue.length){q.innerHTML='';return;}
+const done=state.videoCompleted+state.videoFailed;
+let h='<div style="background:#131829;border:1px solid #2a3350;border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;font-size:0.78rem;display:flex;justify-content:space-between"><span style="color:#4a9eff;font-weight:600">'+done+'/'+state.videoQueue.length+'</span><span style="color:#8892b0">'+(done<state.videoQueue.length?'En cours':'Terminé')+'</span></div>';
+h+=state.videoQueue.slice(0,30).map(it=>{
+let ic='○',st='En attente',cl='';
+if(it.status==='creating'){ic='◐';st='Préparation…';cl='processing';}
+else if(it.status==='processing'){ic='◐';st=it.progress||'En cours';cl='processing';}
+else if(it.status==='done'){ic='●';st='Terminé';cl='done';}
+else if(it.status==='failed'){ic='✕';st='Échec';cl='failed';}
+return '<div class="queue-item '+cl+'"><div class="q-icon">'+ic+'</div><div class="q-name">Image '+(it.idx+1)+'</div><div class="q-status">'+esc(st)+'</div></div>';
+}).join('');
+q.innerHTML=h;
+}
+
+async function startVideoGeneration(){
+if(state.videoRunning||!state.images.length)return;
+state.videoRunning=true;state.videoStopped=false;
+state.videoCompleted=0;state.videoFailed=0;
+state.videoQueue=state.images.map((img,i)=>({idx:i,image:img,status:'pending',progress:null}));
+$('genVideo').disabled=true;
+$('stopBtn').classList.remove('hidden');
+refreshVideoBtn();renderVideoQueue();
+const tasks=[];
+try{
+for(let i=0;i<state.videoQueue.length;i++){
+if(state.videoStopped)break;
+tasks.push(processVideoItem(state.videoQueue[i]));
+if(i<state.videoQueue.length-1&&!state.videoStopped){
+const w=Math.ceil(CREATE_INTERVAL_MS/1000);
+for(let r=w;r>0;r--){
+if(state.videoStopped)break;
+setStatus('Respiration… Image '+(i+2)+' dans '+r+'s');
+await sleep(1000);
+}
+}
+}
+if(tasks.length)await Promise.allSettled(tasks);
+}catch(e){log('Erreur vidéo : '+e.message);}
+setStatus('✦ '+state.videoCompleted+'/'+state.videoQueue.length+' vidéos ✦');
+await sleep(3000);
+setStatus(null);
+state.videoRunning=false;state.videoStopped=false;
+$('stopBtn').classList.add('hidden');
+refreshVideoBtn();
+}
+
+function stopVideoGeneration(){
+if(!state.videoRunning)return;
+state.videoStopped=true;
+setStatus('Arrêt…');
+}
+
+(function init(){
+initTabs();
+initStyles();
+
+$('genText').addEventListener('click',generateText);
+$('textStyle').addEventListener('change',e=>{state.textStyle=e.target.value;});
+$('textLength').addEventListener('change',e=>{state.textLength=e.target.value;});
+
+$('genImage').addEventListener('click',generateImage);
+
+$('uploadZone').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',e=>{handleFiles(e.target.files);e.target.value='';});
+$('genVideo').addEventListener('click',startVideoGeneration);
+$('stopBtn').addEventListener('click',stopVideoGeneration);
+$('videoDuration').addEventListener('change',e=>{state.videoDuration=parseInt(e.target.value,10);});
+
+renderImages();
+refreshVideoBtn();
+renderVideoQueue();
+log('Studio Créatif prêt.');
+})();
+</script>
+</body>
+</html>
